@@ -1,0 +1,67 @@
+<html>
+  <head>
+    <title>Simple login</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js">  </script>
+    <script>
+      $(document).ready(function(){
+        var user,pass;
+        $("#submit").click(function(){
+          user=$("#user").val();
+          pass=$("#password").val();
+          $.post("http://localhost:3000/login",{user: user,password: pass}, function(data){
+            console.log(data.user_name);
+            if(data==='done')
+              {
+                console.log("login success"); 
+              }
+          });
+        });
+
+        $("#read").click(function(){
+            $.post("http://localhost:3000/Read", function(data){
+              //console.log(data.user_name);
+              if(data==='done')
+                {
+                  console.log("Read success"); 
+                }
+            });
+        });
+
+        $("#update").click(function(){
+          user=$("#user").val();
+
+          $.post("http://localhost:3000/Update",{user: user}, function(data){
+            //console.log(data.user_name);
+            if(data==='done')
+              {
+                console.log("Read success"); 
+              }
+          });
+        });
+
+        $("#delete").click(function(){
+          user=$("#user").val();
+
+          $.post("http://localhost:3000/Delete",{user: user}, function(data){
+            //console.log(data.user_name);
+            if(data==='done')
+              {
+                console.log("Read success"); 
+              }
+          });
+        });
+
+      });
+    </script>
+  </head>
+  <body>
+    <h1>CRUD OPERATION</h1>
+    <input type="TEXT" id="user" size="40"><br>
+    <input type="password" id="password" size="40"><br>
+    <input type="button" id="submit" value="Create">
+    <input type="button" id="read" value="Read">
+    <input type="button" id="update" value="Update">
+    <input type="button" id="delete" value="Delete">
+
+  </body>
+</html>
