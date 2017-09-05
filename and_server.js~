@@ -1,4 +1,4 @@
-var port           =         8000;
+var port           =         8002;
 var express        =         require("express");
 var bodyParser     =         require("body-parser");
 var connect = require('connect');
@@ -10,7 +10,7 @@ var fs = require('fs');
 
 var nodemailer = require("nodemailer");
 
-mongoose.connect('mongodb://localhost/Veggi');
+mongoose.connect('mongodb://localhost/washingadda');
 
 
 // Configuration
@@ -32,96 +32,22 @@ var User = new mongoose.Schema({
 	email      : String,
 	phoneno    : String,
 	password   : String,
-  usertype   : String,
+  	verificationCode :String
+});
+
+var Address = new mongoose.Schema({
+  email      : String,
+  phoneno    : String,
   address    : String,
   pincode    : String,
-  landmark   : String
-});
-
-var Vegetable = new mongoose.Schema({
-  added_by            : String,
-  vegetable_name      : String,
-  vegetable_name_hindi: String,
-  price               : String,
-  imagename           : String,
-});
-
-var Fruit = new mongoose.Schema({
-  added_by            : String,
-  fruit_name      : String,
-  fruit_name_hindi: String,
-  price               : String,
-  imagename           : String,
-});
-
-var Item = new mongoose.Schema({
-  added_by                : String,
-  item_name               : String,
-  item_price              : String,
-  category                : String,
-  item_per                : String,
-  imagename               : String
-});
-
-
-var Food = new mongoose.Schema({
-  added_by            : String,
-  food_name      : String,
-  price               : String,
-  imagename           : String,
-});
-
-var Grocery = new mongoose.Schema({
-  added_by            : String,
-  grocery_name        : String,
-  price               : String,
-  imagename           : String,
-});
-
-var Beauty = new mongoose.Schema({
-  added_by            : String,
-  beauty_name         : String,
-  price               : String,
-  imagename           : String,
-});
-
-var Beverage = new mongoose.Schema({
-  added_by            : String,
-  beverage_name         : String,
-  price               : String,
-  imagename           : String,
-});
-
-var Order = new mongoose.Schema({
-  ordered_by_email      : String,
-  ordered_by_username   : String,
-  order_id              : String,
-  ordered_on_date       : String,
-  ordered_on_time       : String,
-  item_name             : String,
-  item_price            : String,
-  quantity              : String,
-  item_per              : String,
-  total                 : String
+  landmark   : String,
+  city       : String,
+  defaultAddress : String, 
 });
 
 var user = mongoose.model('user', User);
 
-var vegetable = mongoose.model('vegetable', Vegetable);
-
-var fruit = mongoose.model('fruit', Fruit);
-
-var food = mongoose.model('food', Food);
-
-var grocery = mongoose.model('grocery', Grocery);
-
-var beauty = mongoose.model('beauty', Beauty);
-
-var beverage = mongoose.model('beverage', Beverage);
-
-var order = mongoose.model('order', Order);
-
-var item = mongoose.model('item', Item);
+var saveAddress = mongoose.model('address', Address);
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.get('/',function(req,res){
@@ -129,12 +55,11 @@ app.get('/',function(req,res){
   //res.sendStatus(404);
 });
 
-
 var smtpTransport = nodemailer.createTransport("SMTP",{
 service: "Gmail",
 auth: {
-user: "vinitraj96@gmail.com",
-pass: "bintu.sugun123&"
+user: "orders@idealadda.com",
+pass: "bintu.sugun.123&"
 }
 });
 
@@ -145,12 +70,7 @@ app.post('/register',function(req,res){
   var email=req.body.email;
   var phoneno=req.body.phoneno;
   var password=req.body.password;
-  var usertype=req.body.usertype;
-  var address=req.body.address;
-  var pincode=req.body.pincode;
-  var landmark=req.body.landmark;
-  console.log("pincode>>>>>>"+address);
-  user.find({email:email},function(err,doc){
+  user.find({$and:[{email:email},{phoneno:phoneno}]},function(err,doc){
     if(err){
       console.log('error');
     }else{
@@ -160,14 +80,11 @@ app.post('/register',function(req,res){
           username          : username,
           email             : email,
           phoneno           : phoneno,
-          password          : password,
-          usertype          : usertype,
-          address           : address,
-          pincode           : pincode,
-          landmark          : landmark
+	  password          : password,
+          verificationCode  : ''
         }).save(function(err, doc){
           if(err) console.log('error');
-          else    res.json({"doc":doc});
+          else    res.json({"doc":"valid"});
         });
       }else{
         console.log('already exist');
@@ -177,7 +94,6 @@ app.post('/register',function(req,res){
   });
   
 });
-
 app.post('/login',function(req,res){
   var email=req.body.email;
   var password=req.body.password;
@@ -192,6 +108,17 @@ app.post('/login',function(req,res){
 				res.json({"msg":"invalid"})
 			}
 			if(doc.length===1){
+        user.update({email:email},
+        {
+          $set: {
+           verificationCode : ''
+          }
+        },function(err,doc){
+          if(err){
+            console.log('error');
+          }else{
+          }
+        });
         console.log('valid user');
 				res.json({"msg":"valid"})
 			}
@@ -200,8 +127,6 @@ app.post('/login',function(req,res){
 	});
 
 });
-
-
 app.post('/FetchAccount',function(req,res){
   var email=req.body.email;
   user.find({ email: email },
@@ -211,11 +136,27 @@ app.post('/FetchAccount',function(req,res){
       else{
       if(doc.length===0){
         console.log('invalid user');
-        res.json({"msg":"invalid"})
+        res.json({"msg":"invalid"});
       }
       if(doc.length===1){
         console.log(doc);
-        res.json({"doc":doc})
+        saveAddress.find({ $and: [ { email: email }, { defaultAddress: "true" } ] },
+        function(err,defaultAddress) {
+            if (err) throw err;
+      
+            else{
+            if(doc.length===0){
+              console.log('invalid user');
+              res.json({"msg":"invalid"});
+            }
+            if(doc.length===1){
+              console.log(doc);
+              res.json({"doc":doc,"defaultAddress":defaultAddress});
+            }
+          }
+              
+        });
+        //res.json({"doc":doc})
       }
     }
         
@@ -223,650 +164,81 @@ app.post('/FetchAccount',function(req,res){
 
 });
 
-///////////////////////////////////////////////////// Registration and Login Routes Ends /////////////////////////////////////////////
-
-///////////////////////////////////////////////////// Add Vegetables Routes Starts /////////////////////////////////////////////
-app.post('/AddVegetables',function(req,res){
+app.post('/saveAddress',function(req,res){
+  console.log("saveAddress");
   var email=req.body.email;
-  var vegetable_name=req.body.vegetable_name;
-  var vegetable_name_hindi=req.body.vegetable_name_hindi;
-  var price=req.body.price;
-  var imagename=req.body.imagename;
-  
-  vegetable.find({ $and: [ { vegetable_name: vegetable_name }, { vegetable_name_hindi: vegetable_name_hindi } ] },function(err,doc){
-    if(err){
-      console.log('error');
-    }else{
-      if(doc.length===0){
-        console.log('Adding new vegetable');
-        new vegetable({
-          added_by                : email,
-          vegetable_name          : vegetable_name,
-          vegetable_name_hindi    : vegetable_name_hindi,
-          price                   : price,
-          imagename               : imagename,
-        }).save(function(err, doc){
-          if(err) console.log('error');
-          else    res.json({"doc":doc});
-        });
-      }else{
-        console.log('already exist');
-        res.json({"doc":"already exist"});
-      }
-    }
-  });
-  
-});
-
-app.post('/FetchAllVegetable',function(req,res){
-   console.log('FetchAllVegetable');
-  vegetable.find({},function(err,doc){
-    if(err){
-      console.log('error');
-    }else{
-      res.json({"doc":doc});
-    }
-  });
-  
-});
-
-app.post('/UpdatePrice',function(req,res){
-  var vegetable_name=req.body.vegetable_name;
-  var vegetable_name_hindi=req.body.vegetable_name_hindi;
-  var price=req.body.price;
-  vegetable.update({vegetable_name:vegetable_name},
-   {
-     $set: {
-       price : price
-     }
-   },function(err,doc){
+  var phoneno=req.body.phoneno;
+  var address=req.body.address;
+  var pincode=req.body.pincode;
+  var landmark=req.body.landmark;
+  var city=req.body.city;
+  var defaultAddress=req.body.defaultAddress;
+  saveAddress.find({email:email},function(err, doc) {
       if(err){
-        console.log('error');
+        
       }else{
-        res.json({"doc":"price updated"});   
-      } 
-  });
-});
-
-app.post('/RemoveVegetable',function(req,res){
-  var vegetable_name=req.body.vegetable_name;
-  var vegetable_name_hindi=req.body.vegetable_name_hindi;
-  var price=req.body.price;
-  vegetable.remove({vegetable_name:vegetable_name},function(err,doc){
-      if(err){
-        console.log('error');
-      }else{
-        res.json({"doc":"removed"});   
-      } 
-  });
-});
-
-app.post('/CompleteOrder',function(req,res){
-
-  var email=req.body.email;
-  var username=req.body.username;
-  var orderId=req.body.orderId;
-  var itemName=req.body.itemName;
-  var itemPrice=req.body.itemPrice;
-  var quantity=req.body.quantity;
-  var itemPer=req.body.itemPer;
-  var total=req.body.total;
-  var datetime = new Date();
-
-  console.log(datetime.getDate()+datetime.getMonth());
-  order.find({order_id:orderId},function(err,doc){
-    if(err){
-
-    }else{
-      if(doc.length==0){
-        new order({
-            ordered_by_email      : email,
-            ordered_by_username   : username,
-            order_id              : orderId,
-            ordered_on_date       : datetime.getDate()+"/"+datetime.getMonth()+"/"+datetime.getYear(),
-            ordered_on_time       : datetime.getHours()+":"+datetime.getMinutes()+":"+datetime.getSeconds(),
-            item_name             : itemName,
-            item_price            : itemPrice,
-            quantity              : quantity,
-            item_per              : itemPer,
-            total                 : total
-        }).save(function(err, doc){
-          if(err) console.log('error');
-          else    {
-              var mailHtml1 = '<div style="border: 10px solid #CBCACA;float:left;padding: 1%;background: #F3F3F3">'+
-                                          '<div>'+
-                                              '<img style="height: 60px;width: 245px;float:right;" src="https://scontent.xx.fbcdn.net/hphotos-xfl1/v/t1.0-9/12376575_952217618191264_8341414408216050692_n.jpg?oh=21623549fc1efaa1cb69199e00a5b2e7&oe=571EC8F5" alt="Veggi">'+  
-                                          '</div>'+            
-                                          '<div style="text-align: justify;float:left;">'+
-                                              '<p>Hi <b style="color:blue;">'+username+'</b></p>'+
-                                              '<p>Your order is</p>';                        
-                                      
-              var mailHtml='';
-              for(var i=0;i<itemName.split(",").length;i++){
-                if(i==0){
-
-                }else{
-                    var x = parseInt(quantity.split(",")[i], 10)*parseInt(itemPrice.split(",")[i], 10);
-                    mailHtml=mailHtml+'<p><b style="color:blue;">'+itemName.split(",")[i]+'</b>'+" "+quantity.split(",")[i]+"*"+itemPrice.split(",")[i]+"="+x+" Rs"+' </p>';
-                }
-              }
-              mailHtml1=mailHtml1+mailHtml+
-                        '<p>Total Amount:'+total+'</p>'
-                        '</div>'+
-                        '</div>';
-              var mailOptions={
-                to : "vinitraj96@gmail.com,"+email,
-                subject : "Your veegi order summary",
-                text : "veggi",
-                html: mailHtml1
-              }
-              console.log(mailOptions);
-              smtpTransport.sendMail(mailOptions, function(error, response){
-                if(error){
-                console.log(error);
-                
-                }else{
-                }
-              });
-              res.json({"doc":"order completed"});
+        if(doc.length===0){
+            new saveAddress({
+              email             : email,
+              phoneno           : phoneno,
+              address           : address,
+              pincode           : pincode,
+              landmark          : landmark,
+              city              : city,
+              defaultAddress    : "true"
+            }).save(function(err, doc){
+              if(err) console.log('error');
+              else    res.json({"doc":doc});
+            });
+        }else{
+          if(defaultAddress==="true"){
+            saveAddress.update({email:email},
+                {
+                  $set: {
+                   defaultAddress : "false"
+                  }
+                },{ multi: true },function(err,doc){
+                  if(err){
+                    console.log('error');
+                  }else{
+                    console.log('done');
+                    new saveAddress({
+                      email             : email,
+                      phoneno           : phoneno,
+                      address           : address,
+                      pincode           : pincode,
+                      landmark          : landmark,
+                      city              : city,
+                      defaultAddress    : defaultAddress
+                    }).save(function(err, doc){
+                      if(err) console.log('error');
+                      else    res.json({"doc":doc});
+                    });
+                  }
+            });
+          }else{
+            new saveAddress({
+              email             : email,
+              phoneno           : phoneno,
+              address           : address,
+              pincode           : pincode,
+              landmark          : landmark,
+              city              : city,
+              defaultAddress    : defaultAddress
+            }).save(function(err, doc){
+              if(err) console.log('error');
+              else    res.json({"doc":doc});
+            });
           }
-        });
+        }
       }
-    }
-  });
-});
-
-app.post('/FetchOrder',function(req,res){
-  email=req.body.email;
-  order.find({ordered_by_email:email},function(err,doc){
-    if (err) {
-
-    }else{
-      if(doc.length===0){
-        res.json({"doc":"no order"});
-      }else{
-        res.json({"doc":doc});
-      }
-    }
-  });
-});
-
-/*app.get('/',function(req,res){
-  res.end("Node-File-Upload");
-
-});*/
-app.post('/upload', function(req, res) {
-  console.log(req.files.image.originalFilename);
-  console.log(req.files.image.path);
-    fs.readFile(req.files.image.path, function (err, data){
-    var dirname = "/home/ritzylab3/Desktop/Projects/node_for_veggi";
-    var newPath = dirname + "/uploads/" +   req.files.image.originalFilename;
-    fs.writeFile(newPath, data, function (err) {
-    if(err){
-    res.json({'response':"Error"});
-    }else {
-    res.json({'response':"Saved"});     
-}
-});
-});
-});
-
-app.post('/AddFruits',function(req,res){
-  var email=req.body.email;
-  var fruit_name=req.body.fruits_name;
-  var fruit_name_hindi=req.body.fruits_name_hindi;
-  var price=req.body.price;
-  var imagename=req.body.imagename;
-  
-  fruit.find({ $and: [ { fruit_name: fruit_name }, { fruit_name_hindi: fruit_name_hindi } ] },function(err,doc){
-    if(err){
-      console.log('error');
-    }else{
-      if(doc.length===0){
-        console.log('Adding new food');
-        new fruit({
-          added_by                : email,
-          fruit_name              : fruit_name,
-          fruit_name_hindi        : fruit_name_hindi,
-          price                   : price,
-          imagename               : imagename,
-        }).save(function(err, doc){
-          if(err) console.log('error');
-          else    res.json({"doc":doc});
-        });
-      }else{
-        console.log('already exist');
-        res.json({"doc":"already exist"});
-      }
-    }
   });
   
+  console.log("pincode>>>>>>"+address);
+  console.log('Adding new ADDRESS');
 });
 
-app.post('/FetchAllFruits',function(req,res){
-   console.log('FetchAllFruits');
-  fruit.find({},function(err,doc){
-    if(err){
-      console.log('error');
-    }else{
-      res.json({"doc":doc});
-    }
-  });
-  
-});
-
-app.post('/UpdateFruitsPrice',function(req,res){
-  var fruit_name=req.body.fruit_name;
-  var price=req.body.price;
-  fruit.update({fruit_name:fruit_name},
-   {
-     $set: {
-       price : price
-     }
-   },function(err,doc){
-      if(err){
-        console.log('error');
-      }else{
-        res.json({"doc":"price updated"});   
-      } 
-  });
-});
-
-app.post('/RemoveFruits',function(req,res){
-  var fruit_name=req.body.fruit_name;
-  var price=req.body.price;
-  fruit_name.remove({fruit_name:fruit_name},function(err,doc){
-      if(err){
-        console.log('error');
-      }else{
-        res.json({"doc":"removed"});   
-      } 
-  });
-});
-
-
-app.post('/AddFood',function(req,res){
-  var email=req.body.email;
-  var food_name=req.body.food_name;
-  var price=req.body.price;
-  var imagename=req.body.imagename;
-  
-  food.find({food_name: food_name},function(err,doc){
-    if(err){
-      console.log('error');
-    }else{
-      if(doc.length===0){
-        console.log('Adding new food');
-        new food({
-          added_by                : email,
-          food_name               : food_name,
-          price                   : price,
-          imagename               : imagename,
-        }).save(function(err, doc){
-          if(err) console.log('error');
-          else    res.json({"doc":doc});
-        });
-      }else{
-        console.log('already exist');
-        res.json({"doc":"already exist"});
-      }
-    }
-  });
-  
-});
-
-app.post('/FetchAllFood',function(req,res){
-   console.log('FetchAllFood');
-  food.find({},function(err,doc){
-    if(err){
-      console.log('error');
-    }else{
-      res.json({"doc":doc});
-    }
-  });
-  
-});
-
-app.post('/UpdateFoodPrice',function(req,res){
-  var food_name=req.body.food_name;
-  var price=req.body.price;
-  food.update({food_name:food_name},
-   {
-     $set: {
-       price : price
-     }
-   },function(err,doc){
-      if(err){
-        console.log('error');
-      }else{
-        res.json({"doc":"price updated"});   
-      } 
-  });
-});
-
-app.post('/RemoveFood',function(req,res){
-  var food_name=req.body.food_name;
-  var price=req.body.price;
-  food.remove({food_name:food_name},function(err,doc){
-      if(err){
-        console.log('error');
-      }else{
-        res.json({"doc":"removed"});   
-      } 
-  });
-});
-
-app.post('/AddGrocery',function(req,res){
-  var email=req.body.email;
-  var grocery_name=req.body.grocery_name;
-  var price=req.body.price;
-  var imagename=req.body.imagename;
-  
-  grocery.find({grocery_name: grocery_name},function(err,doc){
-    if(err){
-      console.log('error');
-    }else{
-      if(doc.length===0){
-        console.log('Adding new grocery');
-        new grocery({
-          added_by                : email,
-          grocery_name            : grocery_name,
-          price                   : price,
-          imagename               : imagename,
-        }).save(function(err, doc){
-          if(err) console.log('error');
-          else    res.json({"doc":doc});
-        });
-      }else{
-        console.log('already exist');
-        res.json({"doc":"already exist"});
-      }
-    }
-  });
-  
-});
-
-app.post('/FetchAllGrocery',function(req,res){
-   console.log('FetchAllGrocery');
-  grocery.find({},function(err,doc){
-    if(err){
-      console.log('error');
-    }else{
-      res.json({"doc":doc});
-    }
-  });
-  
-});
-
-app.post('/UpdateGroceryPrice',function(req,res){
-  var grocery_name=req.body.grocery_name;
-  var price=req.body.price;
-  grocery.update({grocery_name:grocery_name},
-   {
-     $set: {
-       price : price
-     }
-   },function(err,doc){
-      if(err){
-        console.log('error');
-      }else{
-        res.json({"doc":"price updated"});   
-      } 
-  });
-});
-
-app.post('/RemoveGrocery',function(req,res){
-  var grocery_name=req.body.grocery_name;
-  var price=req.body.price;
-  grocery.remove({grocery_name:grocery_name},function(err,doc){
-      if(err){
-        console.log('error');
-      }else{
-        res.json({"doc":"removed"});   
-      } 
-  });
-});
-
-app.post('/AddBeautyAndPersonalCare',function(req,res){
-  var email=req.body.email;
-  var beauty_name=req.body.beauty_name;
-  var price=req.body.price;
-  var imagename=req.body.imagename;
-  
-  beauty.find({beauty_name: beauty_name},function(err,doc){
-    if(err){
-      console.log('error');
-    }else{
-      if(doc.length===0){
-        console.log('Adding new beauty');
-        new beauty({
-          added_by                : email,
-          beauty_name             : beauty_name,
-          price                   : price,
-          imagename               : imagename,
-        }).save(function(err, doc){
-          if(err) console.log('error');
-          else    res.json({"doc":doc});
-        });
-      }else{
-        console.log('already exist');
-        res.json({"doc":"already exist"});
-      }
-    }
-  });
-  
-});
-
-app.post('/FetchAllBeautyAndPersonalCare',function(req,res){
-   console.log('FetchAllBeautyAndPersonalCare');
-  beauty.find({},function(err,doc){
-    if(err){
-      console.log('error');
-    }else{
-      res.json({"doc":doc});
-    }
-  });
-  
-});
-
-app.post('/UpdateBeautyAndPersonalCarePrice',function(req,res){
-  var beauty_name=req.body.beauty_name;
-  var price=req.body.price;
-  beauty.update({beauty_name:beauty_name},
-   {
-     $set: {
-       price : price
-     }
-   },function(err,doc){
-      if(err){
-        console.log('error');
-      }else{
-        res.json({"doc":"price updated"});   
-      } 
-  });
-});
-
-app.post('/RemoveBeautyAndPersonalCare',function(req,res){
-  var beauty_name=req.body.beauty_name;
-  var price=req.body.price;
-  beauty.remove({beauty_name:beauty_name},function(err,doc){
-      if(err){
-        console.log('error');
-      }else{
-        res.json({"doc":"removed"});   
-      } 
-  });
-});
-
-app.post('/AddBeverages',function(req,res){
-  var email=req.body.email;
-  var beverage_name=req.body.beverage_name;
-  var price=req.body.price;
-  var imagename=req.body.imagename;
-  
-  beverage.find({beverage_name: beverage_name},function(err,doc){
-    if(err){
-      console.log('error');
-    }else{
-      if(doc.length===0){
-        console.log('Adding new beverage');
-        new beverage({
-          added_by                : email,
-          beverage_name           : beverage_name,
-          price                   : price,
-          imagename               : imagename,
-        }).save(function(err, doc){
-          if(err) console.log('error');
-          else    res.json({"doc":doc});
-        });
-      }else{
-        console.log('already exist');
-        res.json({"doc":"already exist"});
-      }
-    }
-  });
-  
-});
-
-app.post('/FetchAllBeverages',function(req,res){
-   console.log('FetchAllBeverages');
-  beverage.find({},function(err,doc){
-    if(err){
-      console.log('error');
-    }else{
-      res.json({"doc":doc});
-    }
-  });
-  
-});
-
-app.post('/UpdateBeveragesPrice',function(req,res){
-  var beverage_name=req.body.beverage_name;
-  var price=req.body.price;
-  beverage.update({beverage_name:beverage_name},
-   {
-     $set: {
-       price : price
-     }
-   },function(err,doc){
-      if(err){
-        console.log('error');
-      }else{
-        res.json({"doc":"price updated"});   
-      } 
-  });
-});
-
-app.post('/RemoveBeverages',function(req,res){
-  var beverage_name=req.body.beverage_name;
-  var price=req.body.price;
-  beverage.remove({beverage_name:beverage_name},function(err,doc){
-      if(err){
-        console.log('error');
-      }else{
-        res.json({"doc":"removed"});   
-      } 
-  });
-});
-
-app.post('/AddItem',function(req,res){
-  var email=req.body.email;
-  var item_name=req.body.item_name;
-  var item_price=req.body.item_price;
-  var category=req.body.category;
-  var item_per=req.body.item_per;
-  var imagename=req.body.imagename;
-  
-  item.find({ $and: [ { item_name: item_name }, { category: category } ] },function(err,doc){
-    if(err){
-      console.log('error');
-    }else{
-      if(doc.length===0){
-        console.log('Adding new food');
-        new item({
-          added_by                : email,
-          item_name               : item_name,
-          item_price              : item_price,
-          category                : category,
-          item_per                : item_per,
-          imagename               : imagename
-        }).save(function(err, doc){
-          if(err) console.log('error');
-          else    res.json({"doc":doc});
-        });
-      }else{
-        console.log('already exist');
-        res.json({"doc":"already exist"});
-      }
-    }
-  });
-  
-});
-
-app.post('/FetchAllItem',function(req,res){
-   console.log('FetchAllItem');
-   var category=req.body.category;
-  item.find({category:category},function(err,doc){
-    if(err){
-      console.log('error');
-    }else{
-      res.json({"doc":doc});
-    }
-  });
-  
-});
-
-app.post('/FetchSearchItem',function(req,res){
-   console.log('FetchAllItem');
-   var search=req.body.search;
-   var re = new RegExp(search);
-  item.find({ item_name: { $regex: re } },function(err,doc){
-    if(err){
-      console.log('error');
-    }else{
-      res.json({"doc":doc});
-    }
-  });
-  
-});
-app.post('/UpdateItemPrice',function(req,res){
-  var item_name=req.body.item_name;
-  var item_price=req.body.item_price;
-  item.update({item_name:item_name},
-   {
-     $set: {
-       item_price : item_price
-     }
-   },function(err,doc){
-      if(err){
-        console.log('error');
-      }else{
-        res.json({"doc":"price updated"});   
-      } 
-  });
-});
-
-app.post('/RemoveItem',function(req,res){
-  var item_name=req.body.item_name;
-   item.remove({item_name:item_name},function(err,doc){
-      if(err){
-        console.log('error');
-      }else{
-        res.json({"doc":"removed"});   
-      } 
-  });
-});
-
-
-app.get('/uploads/:file', function (req, res){
-    file = req.params.file;
-    var dirname = "/home/ritzylab3/Desktop/Projects/node_for_veggi";
-    var img = fs.readFileSync(dirname + "/uploads/" + file);
-    res.writeHead(200, {'Content-Type': 'image/jpg' });
-    res.end(img, 'binary');
-
-});
-
-app.listen(port,function(){
-  console.log("Started on PORT "+port);
+app.listen(8002, function(){
+  //var addr = app.address();
+  console.log("Chat server listening at, 8002");
 });
