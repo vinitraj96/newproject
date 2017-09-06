@@ -10,7 +10,7 @@ const nexmo = new Nexmo({
   apiKey: "bac0dc05",
   apiSecret: "849ea4a9f5790a21"
 });
-var app.set('port',(process.env.PORT||8080));
+app.set('port',(process.env.PORT||8080));
 
 
 var nodemailer = require("nodemailer");
