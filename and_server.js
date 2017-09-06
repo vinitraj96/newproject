@@ -26,7 +26,7 @@ app.use(connect.urlencoded());
 // Routes
 
 //require('./routes/routes.js')(app);
-
+var app.set('port',(process.env.PORT||8080));
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.get('/',function(req,res){
@@ -43,7 +43,7 @@ pass: "sugun.bintu.123&"
 });
 
 
-app.listen(8002, function(){
+app.listen(app.get('port'), function(){
   //var addr = app.address();
-  console.log("Chat server listening at, 8002");
+  console.log("Chat server listeing at,"+ app.get('port'));
 });
