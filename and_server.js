@@ -25,7 +25,7 @@ app.use(connect.urlencoded());
 // Routes
 
 //require('./routes/routes.js')(app);
-var app.set('port',(process.env.PORT||8080));
+app.set('port',(process.env.PORT||8080));
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.get('/',function(req,res){
