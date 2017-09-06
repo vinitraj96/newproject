@@ -15,7 +15,7 @@ app.set('port',(process.env.PORT||8080));
 
 var nodemailer = require("nodemailer");
 
-mongoose.connect('mongodb://vinit1989:hello123vinit@ds127854.mlab.com:27854/pipiride');
+mongoose.connect('mongodb://vinit1989:hello123vinit@ds127854.mlab.com:27854/pipiride', [], { authMechanism : 'ScramSHA1' });
 
 
 // Configuration
