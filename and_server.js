@@ -102,7 +102,7 @@ app.post('/register',function(req,res){
           if(err) console.log('error');
           else{
             //setTimeout(myFunc, 5 * 60 * 1000,mobileNo,otp,res);
-             res.json({"doc":"valid"});
+             res.json({"doc":"valid","otp":"otp: "+otp.toString()});
           }
         });
       }else{
@@ -117,7 +117,7 @@ app.post('/register',function(req,res){
           }else{
             //setTimeout(myFunc, 5 * 60 * 1000,mobileNo,otp,res);
 
-            res.json({"doc":"valid"});
+            res.json({"doc":"valid","otp":"otp: "+otp.toString()});
           }
         });
       }
@@ -143,11 +143,11 @@ app.post('/matchOtp',function(req,res){
           $set: {
            otp : ''
           }
-        },function(err,doc1){
+        },function(err,doc){
           if(err){
             console.log('error');
           }else{
-             res.json({"doc":"valid","data":doc});
+             res.json({"doc":"valid"});
           }
         });
       }
