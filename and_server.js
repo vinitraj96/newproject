@@ -2,7 +2,7 @@
 var express        =         require("express");
 var bodyParser     =         require("body-parser");
 var connect = require('connect');
-app            =         express();
+var app            =         express();
 //var mongoose       =         require('mongoose');
 var fs = require('fs');
 const Nexmo = require('nexmo');
