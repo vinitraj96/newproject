@@ -14,6 +14,7 @@ const nexmo = new Nexmo({
 
 
 var nodemailer = require("nodemailer");
+mongoose.connect('mongodb://vinitraj:vin@ds127854.mlab.com:27854/pipiride');
 
 // Configuration
 app.use(express.static(__dirname + '/public'));
