@@ -3,17 +3,16 @@ var express        =         require("express");
 var bodyParser     =         require("body-parser");
 var connect = require('connect');
 var app            =         express();
-var mongoose       =         require('mongoose');
 var fs = require('fs');
 const Nexmo = require('nexmo');
 const nexmo = new Nexmo({
   apiKey: "bac0dc05",
   apiSecret: "849ea4a9f5790a21"
 });
-var nodemailer = require("nodemailer");
-app.set('port',(process.env.PORT||8080));
-mongoose.connect('mongodb://vinitraj:vin@ds127854.mlab.com:27854/pipiride');
 
+
+
+var nodemailer = require("nodemailer");
 
 // Configuration
 app.use(express.static(__dirname + '/public'));
@@ -27,14 +26,12 @@ app.use(connect.urlencoded());
 // Routes
 
 //require('./routes/routes.js')(app);
-
-
+app.set('port',(process.env.PORT||8080));
 
 app.use(bodyParser.urlencoded({ extended: false }));
-
 app.get('/',function(req,res){
-  //res.sendFile(__dirname +'/index.html');
-  res.end('Hello Vinit');
+  res.sendFile(__dirname +'/index.html');
+  //res.sendStatus(404);
 });
 
 var smtpTransport = nodemailer.createTransport("SMTP",{
