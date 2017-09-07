@@ -10,12 +10,9 @@ const nexmo = new Nexmo({
   apiKey: "bac0dc05",
   apiSecret: "849ea4a9f5790a21"
 });
-app.set('port',(process.env.PORT||8080));
-
-
 var nodemailer = require("nodemailer");
-
-//mongoose.connect('mongodb://vinitraj:vin@ds127854.mlab.com:27854/pipiride');
+app.set('port',(process.env.PORT||8080));
+mongoose.connect('mongodb://vinitraj:vin@ds127854.mlab.com:27854/pipiride');
 
 
 // Configuration
@@ -34,9 +31,10 @@ app.use(connect.urlencoded());
 
 
 app.use(bodyParser.urlencoded({ extended: false }));
+
 app.get('/',function(req,res){
-  res.sendFile(__dirname +'/index.html');
-  //res.sendStatus(404);
+  //res.sendFile(__dirname +'/index.html');
+  res.end('Hello Vinit');
 });
 
 var smtpTransport = nodemailer.createTransport("SMTP",{
