@@ -143,11 +143,11 @@ app.post('/matchOtp',function(req,res){
           $set: {
            otp : ''
           }
-        },function(err,doc){
+        },function(err,doc1){
           if(err){
             console.log('error');
           }else{
-             res.json({"doc":"valid"});
+             res.json({"doc":"valid","data":doc});
           }
         });
       }
