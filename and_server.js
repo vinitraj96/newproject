@@ -214,9 +214,10 @@ app.post('/SearchCoupon',function(req,res){
 
     }else{
       if(data.length==0){
-	res.json({"doc":"successfully added"});
-      }else{
+	
 	res.json({"doc":"no such coupon"});
+      }else{
+	res.json({"doc":"successfully added"});
       }
     }
   });
