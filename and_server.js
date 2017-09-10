@@ -66,7 +66,7 @@ var AddBike = mongoose.model('add_bike', AddBike);
 
 var Venue = mongoose.model('venue', Venue);
 
-var coupon = mongooes.model('coupon',Coupon);
+var Coupon = mongoose.model('coupon', Coupon);
 
 app.get('/',function(req,res){
   res.sendFile(__dirname +'/index.html');
@@ -186,12 +186,12 @@ function myFunc(arg,res) {
 app.post('/AddCoupon',function(req,res){
   console.log("add coupon .....................................");
   var couponCode=req.body.couponCode;
-  coupon.find({'couponCode': couponCode } ,function(err,data){
+  Coupon.find({'couponCode': couponCode } ,function(err,data){
     if(err){
 
     }else{
       if(data.length==0){
-	new coupon({
+	new Coupon({
 	  couponCode : couponCode
 	}).save(function(err, doc){
 	  if(err) console.log('error');
