@@ -206,6 +206,22 @@ app.post('/AddCoupon',function(req,res){
   });
 });
 
+app.post('/SearchCoupon',function(req,res){
+  console.log("search coupon .....................................");
+  var couponCode=req.body.couponCode;
+  Coupon.find({'couponCode': couponCode } ,function(err,data){
+    if(err){
+
+    }else{
+      if(data.length==0){
+	res.json({"doc":"successfully added"});
+      }else{
+	res.json({"doc":"no such coupon"});
+      }
+    }
+  });
+});
+
 app.post('/AddVenue',function(req,res){
   console.log("add venue .....................................");
   var areaName=req.body.areaName;
