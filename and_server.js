@@ -56,7 +56,7 @@ var Venue = new mongoose.Schema({
   location: String
 });
 
-var coupon = new mongoose.Schema({
+var Coupon = new mongoose.Schema({
   couponCode: String
 });
 
