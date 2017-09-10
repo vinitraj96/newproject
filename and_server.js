@@ -37,8 +37,16 @@ var User = new mongoose.Schema({
 	email      : String,
 	mobileNo    : String,
 	password   : String,
-  otp        : String,
-  verificationCode :String
+  	otp        : String,
+  	verificationCode :String,
+	vechileNameBooked:String,
+	vechileAreaBooked:String,
+	vechilePriceBooked:String,
+	vechleStartDate:String,
+	vechileStartTime:String,
+	vechileEndDate:String,
+	vechileEndTime:String
+	
 });
 
 var AddBike = new mongoose.Schema({
@@ -48,7 +56,12 @@ var AddBike = new mongoose.Schema({
   seat          : String,
   priceSixHour  : String,
   kmLimitSixHour: String,
-  areaName      : String
+  areaName      : String,
+  vechilePriceBooked:String,
+  vechleStartDate:String,
+  vechileStartTime:String,
+  vechileEndDate:String,
+  vechileEndTime:String	
 });
 
 var Venue = new mongoose.Schema({
@@ -183,6 +196,65 @@ function myFunc(arg,res) {
     });
 }
 
+app.post('/CompletePayment',function(req,res){
+  console.log("add coupon .....................................");
+  var mobileNo=req.body.phoneNo;
+	var vechileNameBooked=req.body.bikeName;
+	var vechileAreaBooked=req.body.areaName;
+	var vechilePriceBooked=req.body.bikePrice;
+	var vechleStartDate=req.body.startdate;
+	var vechileStartTime=req.body.starttime;
+	var vechileEndDate=req.body.enddate;
+	var vechileEndTime=req.body.endtime;
+	  user.find({'mobileNo': mobileNo } ,function(err,data){
+	    if(err){
+
+	    }else{
+	      if(data.length==0){
+	      }else{
+		user.update({mobileNo:mobileNo},
+		{
+		  $set: {
+		   vechileNameBooked : vechileNameBooked,
+			  vechileAreaBooked : vechileAreaBooked,
+			  vechilePriceBooked : vechilePriceBooked,
+			  vechleStartDate : vechleStartDate,
+			  vechileStartTime : vechileStartTime,
+			  vechileEndDate : vechileEndDate,
+			  vechileEndTime : vechileEndTime
+		  }
+		},function(err,doc){
+		  if(err){
+		    console.log('error');
+		  }else{
+		    //setTimeout(myFunc, 5 * 60 * 1000,mobileNo,otp,res);
+
+		    //res.json({"doc":"valid","otp":"otp: "+otp.toString()});
+		  	AddBike.update({ $and: [ {'areaName': vechileAreaBooked }, { 'bikeName': bikeName } ] },
+			{
+			  $set: {
+			   	  vechilePriceBooked : vechilePriceBooked,
+				  vechleStartDate : vechleStartDate,
+				  vechileStartTime : vechileStartTime,
+				  vechileEndDate : vechileEndDate,
+				  vechileEndTime : vechileEndTime
+			  }
+			},function(err,doc){
+			  if(err){
+			    console.log('error');
+			  }else{
+			    //setTimeout(myFunc, 5 * 60 * 1000,mobileNo,otp,res);
+
+			    res.json({"doc":"booked"});
+			  }
+			});
+		  }
+		});
+	      }
+	    }
+	  });
+});
+
 app.post('/AddCoupon',function(req,res){
   console.log("add coupon .....................................");
   var couponCode=req.body.couponCode;
@@ -275,7 +347,12 @@ app.post('/AddBike',function(req,res){
           seat : seat,
           priceSixHour : priceSixHour,
           kmLimitSixHour : kmLimitSixHour,
-          areaName : areaName
+          areaName : areaName,
+	  vechilePriceBooked : '',
+	  vechleStartDate : '',
+	  vechileStartTime : '',
+	  vechileEndDate : '',
+	  vechileEndTime : ''
 	}).save(function(err, doc){
 	  if(err) console.log('error');
 	  else{
