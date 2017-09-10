@@ -57,11 +57,13 @@ var AddBike = new mongoose.Schema({
   priceSixHour  : String,
   kmLimitSixHour: String,
   areaName      : String,
+  location      : String,
   vechilePriceBooked:String,
   vechleStartDate:String,
   vechileStartTime:String,
   vechileEndDate:String,
-  vechileEndTime:String	
+  vechileEndTime:String,
+  vechileBookedByPhoneNo:String
 });
 
 var Venue = new mongoose.Schema({
@@ -244,11 +246,13 @@ app.post('/CompletePayment',function(req,res){
 		  	AddBike.update({ $and: [ {'areaName': vechileAreaBooked }, { 'bikeName': vechileNameBooked } ] },
 			{
 			  $set: {
+				  
 			   	  vechilePriceBooked : vechilePriceBooked,
 				  vechleStartDate : vechleStartDate,
 				  vechileStartTime : vechileStartTime,
 				  vechileEndDate : vechileEndDate,
-				  vechileEndTime : vechileEndTime
+				  vechileEndTime : vechileEndTime,
+				  vechileBookedByPhoneNo:mobileNo
 			  }
 			},function(err,doc){
 			  if(err){
@@ -343,6 +347,7 @@ app.post('/AddBike',function(req,res){
   var priceSixHour= req.body.priceSixHour;
   var kmLimitSixHour= req.body.kmLimitSixHour;
   var areaName= req.body.areaName;
+  var location= req.body.location;
   AddBike.find({ $and: [ {'bikeName': bikeName }, { 'bikeRegNo': bikeRegNo } ] },function(err,data){
     if(err){
 
@@ -359,11 +364,13 @@ app.post('/AddBike',function(req,res){
           priceSixHour : priceSixHour,
           kmLimitSixHour : kmLimitSixHour,
           areaName : areaName,
+	  location : location,
 	  vechilePriceBooked : '',
 	  vechleStartDate : '',
 	  vechileStartTime : '',
 	  vechileEndDate : '',
-	  vechileEndTime : ''
+	  vechileEndTime : '',
+          vechileBookedByPhoneNo:''
 	}).save(function(err, doc){
 	  if(err) console.log('error');
 	  else{
@@ -377,6 +384,28 @@ app.post('/AddBike',function(req,res){
   });
 });
 
+
+app.post('/FetchUserAndBike',function(req,res){
+  var phoneNo=req.body.phoneNo;
+  AddBike.find({ vechileBookedByPhoneNo: phoneNo },
+  function(err,doc) {
+      if (err) throw err;
+
+      else{
+      if(doc.length===0){
+        console.log('invalid user');
+        res.json({"msg":"invalid"});
+      }
+      if(doc.length===1){
+        console.log(doc);
+        res.json({"doc":doc});
+        //res.json({"doc":doc})
+      }
+    }
+        
+  });
+
+});
 app.post('/FetchAccount',function(req,res){
   var phoneNo=req.body.phoneNo;
   user.find({ mobileNo: phoneNo },
