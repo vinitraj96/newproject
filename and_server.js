@@ -53,6 +53,11 @@ var AddBike = new mongoose.Schema({
 
 var Venue = new mongoose.Schema({
   areaName: String,
+  location: String
+});
+
+var coupon = new mongoose.Schema({
+  couponCode: String
 });
 
 var user = mongoose.model('user', User);
@@ -60,6 +65,8 @@ var user = mongoose.model('user', User);
 var AddBike = mongoose.model('add_bike', AddBike);
 
 var Venue = mongoose.model('venue', Venue);
+
+var coupon = mongooes.model('coupon','coupon');
 
 app.get('/',function(req,res){
   res.sendFile(__dirname +'/index.html');
@@ -176,57 +183,95 @@ function myFunc(arg,res) {
     });
 }
 
-app.post('/AddBike',function(req,res){
-  console.log("add bike.....................................");
-  var email=req.body.email;
-  var password=req.body.password;
-
-  var bikeName=req.body.bikeName;
-  var bikeImageName= req.body.bikeImageName;
-  var fuelType= req.body.fuelType;
-  var seat= req.body.seat;
-  var priceSixHour= req.body.priceSixHour;
-  var kmLimitSixHour= req.body.kmLimitSixHour;
-  var areaName= req.body.areaName;
-
-  AddBike.find({},function(err,doc){
+app.post('/AddCoupon',function(req,res){
+  console.log("add coupon .....................................");
+  var couponCode=req.body.couponCode;
+  coupon.find({'couponCode': couponCode } ,function(err,data){
     if(err){
-      console.log('error');
-    }else{
-      new AddBike({
-        bikeName : bikeName,
-        bikeImageName : bikeImageName,
-        fuelType : fuelType,
-        seat : seat,
-        priceSixHour : priceSixHour,
-        kmLimitSixHour : kmLimitSixHour,
-        areaName : areaName
-      }).save(function(err, doc){
-        if(err) console.log('error');
-        else{
-          Venue.find({'areaName':areaName},function(err,data){
-            if(err){
 
-            }else{
-              if(data.length==0){
-                new Venue({
-                  areaName : areaName
-                }).save(function(err, doc){
-                  if(err) console.log('error');
-                  else{
-                    res.json({"doc":"successfully added"});
-                  }
-                });
-              }else{
-                res.json({"doc":"successfully added"});
-              }
-            }
-          });
-        }
-      });
+    }else{
+      if(data.length==0){
+	new coupon({
+	  couponCode : couponCode
+	}).save(function(err, doc){
+	  if(err) console.log('error');
+	  else{
+	    res.json({"doc":"successfully added"});
+	  }
+	});
+      }else{
+	res.json({"doc":"already added"});
+      }
     }
   });
 });
+
+app.post('/AddVenue',function(req,res){
+  console.log("add venue .....................................");
+  var areaName=req.body.areaName;
+  var location=req.body.location;
+  Venue.find({ $and: [ {'areaName': areaName }, { 'location': location } ] },function(err,data){
+    if(err){
+
+    }else{
+      if(data.length==0){
+	new Venue({
+	  areaName : areaName,
+	  location : location
+	}).save(function(err, doc){
+	  if(err) console.log('error');
+	  else{
+	    res.json({"doc":"successfully added"});
+	  }
+	});
+      }else{
+	res.json({"doc":"already added"});
+      }
+    }
+  });
+});
+
+app.post('/AddBike',function(req,res){
+  console.log("add bike.....................................");
+  var bikeRegNo=req.body.bikeRegNo;
+  var bikeRegYear=req.body.Year;
+  var bikeColor=req.body.bikeColor;
+  var bikeName=req.body.bikeName;
+  var bikeImageName= req.body.bikeImageName;
+  var fuelType= req.body.fuelType;
+  var seat=req.body.seat;
+  var priceSixHour= req.body.priceSixHour;
+  var kmLimitSixHour= req.body.kmLimitSixHour;
+  var areaName= req.body.areaName;
+  AddBike.find({ $and: [ {'bikeName': bikeName }, { 'bikeRegNo': bikeRegNo } ] },function(err,data){
+    if(err){
+
+    }else{
+      if(data.length==0){
+	new AddBike({
+	  bikeName : bikeName,
+	  bikeRegNo: bikeRegNo,
+	  bikeRegYear: bikeRegYear,
+	  bikeColor: bikeColor,
+          bikeImageName : bikeImageName,
+          fuelType : fuelType,
+          seat : seat,
+          priceSixHour : priceSixHour,
+          kmLimitSixHour : kmLimitSixHour,
+          areaName : areaName
+	}).save(function(err, doc){
+	  if(err) console.log('error');
+	  else{
+	    res.json({"doc":"successfully added"});
+	  }
+	});
+      }else{
+	res.json({"doc":"already added"});
+      }
+    }
+  });
+});
+
 app.post('/FetchAccount',function(req,res){
   var email=req.body.email;
   user.find({ email: email },
