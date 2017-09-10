@@ -230,7 +230,7 @@ app.post('/CompletePayment',function(req,res){
 		    //setTimeout(myFunc, 5 * 60 * 1000,mobileNo,otp,res);
 
 		    //res.json({"doc":"valid","otp":"otp: "+otp.toString()});
-		  	AddBike.update({ $and: [ {'areaName': vechileAreaBooked }, { 'bikeName': bikeName } ] },
+		  	AddBike.update({ $and: [ {'areaName': vechileAreaBooked }, { 'bikeName': vechileNameBooked } ] },
 			{
 			  $set: {
 			   	  vechilePriceBooked : vechilePriceBooked,
