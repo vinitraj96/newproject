@@ -66,7 +66,7 @@ var AddBike = mongoose.model('add_bike', AddBike);
 
 var Venue = mongoose.model('venue', Venue);
 
-var coupon = mongooes.model('coupon',coupon);
+var coupon = mongooes.model('coupon',Coupon);
 
 app.get('/',function(req,res){
   res.sendFile(__dirname +'/index.html');
