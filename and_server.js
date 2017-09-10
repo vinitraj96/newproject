@@ -117,7 +117,18 @@ app.post('/register',function(req,res){
         console.log('Adding new user');
         new user({
           mobileNo : mobileNo,
-          otp : otp.toString()
+          otp : otp.toString(),
+		username   : '',
+		email      : '',
+		password   : '',
+		verificationCode :'',
+		vechileNameBooked:'',
+		vechileAreaBooked:'',
+		vechilePriceBooked:'',
+		vechleStartDate:'',
+		vechileStartTime:'',
+		vechileEndDate:'',
+		vechileEndTime:''
         }).save(function(err, doc){
           if(err) console.log('error');
           else{
@@ -367,8 +378,8 @@ app.post('/AddBike',function(req,res){
 });
 
 app.post('/FetchAccount',function(req,res){
-  var email=req.body.email;
-  user.find({ email: email },
+  var phoneNo=req.body.phoneNo;
+  user.find({ mobileNo: phoneNo },
   function(err,doc) {
       if (err) throw err;
 
@@ -379,22 +390,7 @@ app.post('/FetchAccount',function(req,res){
       }
       if(doc.length===1){
         console.log(doc);
-        saveAddress.find({ $and: [ { email: email }, { defaultAddress: "true" } ] },
-        function(err,defaultAddress) {
-            if (err) throw err;
-      
-            else{
-            if(doc.length===0){
-              console.log('invalid user');
-              res.json({"msg":"invalid"});
-            }
-            if(doc.length===1){
-              console.log(doc);
-              res.json({"doc":doc,"defaultAddress":defaultAddress});
-            }
-          }
-              
-        });
+        res.json({"doc":doc});
         //res.json({"doc":doc})
       }
     }
