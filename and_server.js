@@ -431,6 +431,7 @@ app.post('/FetchAccount',function(req,res){
 
 app.post('/FetchAllAddress',function(req,res){
   console.log("FetchAllAddress");
+  var phoneNo=req.body.phoneNo;
   Venue.find({},function(err,data){
     if(err){
 
