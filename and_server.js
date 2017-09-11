@@ -435,8 +435,18 @@ app.post('/FetchAllAddress',function(req,res){
     if(err){
 
     }else{
-        console.log(data);
-        res.json({"doc":data});
+	    user.find({mobileNo:phoneNo},function(err,doc){
+	    	if(err){
+		}else{
+			if(doc[0].vechileNameBooked==''){
+				 console.log(data);
+        			res.json({"doc":data,"bookedStatus":"not booked"});	
+			}else{
+				res.json({"doc":data,"bookedStatus":"booked"});
+			}
+		}
+	    });
+       
       
     }
   });
