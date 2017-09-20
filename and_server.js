@@ -7,6 +7,8 @@ var mongoose       =         require('mongoose');
 var formidable = require('formidable');
 var fs = require('fs');
 var path = require('path');
+var multipart = require('connect-multiparty');
+var multipartMiddleware = multipart();
  
 
 const Nexmo = require('nexmo');
