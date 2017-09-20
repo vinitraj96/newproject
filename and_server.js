@@ -5,6 +5,28 @@ var connect = require('connect');
 var app            =         express();
 var mongoose       =         require('mongoose');
 var fs = require('fs');
+var router = express.Router();
+ 
+//multer object creation
+var multer  = require('multer')
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/')
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname)
+  }
+})
+ 
+var upload = multer({ storage: storage })
+ 
+ 
+app.post('/upload', upload.single('imageupload'),function(req, res) {
+  res.send("File upload sucessfully.");
+});
+ 
+module.exports = router;
+
 const Nexmo = require('nexmo');
 const nexmo = new Nexmo({
   apiKey: "bac0dc05",
