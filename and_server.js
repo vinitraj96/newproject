@@ -4,12 +4,9 @@ var bodyParser     =         require("body-parser");
 var connect = require('connect');
 var app            =         express();
 var mongoose       =         require('mongoose');
+var formidable = require('formidable');
 var fs = require('fs');
-var router = express.Router();
  
-//multer object creation
-var multer  = require('multer')
-
 
 const Nexmo = require('nexmo');
 const nexmo = new Nexmo({
@@ -104,23 +101,21 @@ pass: "sugun.bintu.123&"
 });
 
 ///////////////////////////////////////////////////// Registration and Login Routes Starts /////////////////////////////////////////////
-var storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/')
-    },
-    filename: function (req, file, cb) {
-        cb(null, file.originalname)
-  }
-})
- 
-var upload = multer({ storage: storage })
- 
- 
-app.post('/upload', upload.single('imageupload'),function(req, res) {
-  res.send("File upload sucessfully.");
+app.post('/upload', function (req, res){
+    var form = new formidable.IncomingForm();
+
+    form.parse(req);
+
+    form.on('fileBegin', function (name, file){
+        file.path = __dirname + '/uploads/' + file.name;
+    });
+
+    form.on('file', function (name, file){
+        console.log('Uploaded ' + file.name);
+    });
+
+    res.json({doc:"sucess"});
 });
- 
-module.exports = router;
 
 app.post('/register',function(req,res){
   console.log("register");
