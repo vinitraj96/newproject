@@ -4,12 +4,8 @@ var bodyParser     =         require("body-parser");
 var connect = require('connect');
 var app            =         express();
 var mongoose       =         require('mongoose');
-var formidable = require('formidable');
 var fs = require('fs');
-var path = require('path');
-var multipart = require('connect-multiparty');
-var multipartMiddleware = multipart();
- 
+
 
 const Nexmo = require('nexmo');
 const nexmo = new Nexmo({
@@ -23,7 +19,7 @@ var nodemailer = require("nodemailer");
 mongoose.connect('mongodb://vinitraj:vin@ds127854.mlab.com:27854/pipiride');
 
 // Configuration
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/uploads'));
 app.use(connect.cookieParser());
 app.use(connect.logger('dev'));
 app.use(connect.bodyParser());
@@ -31,20 +27,6 @@ app.use(connect.bodyParser());
 app.use(connect.json());  
 app.use(connect.urlencoded());
 
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/files', express.static('../imgPipiride'));
-
-var mkdirSync = function(path) {
-    try {
-        fs.mkdirSync(path, '777');
-    } catch (e) {
-        if (e.code != 'EEXIST') throw e;
-
-    }
-}
-
-mkdirSync(path.join(__dirname, '..', 'imgmunshiji'));
-mkdirSync(path.join('../imgmunshiji', 'dl-images'))
 // Routes
 
 //require('./routes/routes.js')(app);
@@ -118,17 +100,20 @@ pass: "sugun.bintu.123&"
 });
 
 ///////////////////////////////////////////////////// Registration and Login Routes Starts /////////////////////////////////////////////
-app.post('/upload', function (req, res){
-    var newPath = path.join('../imgPipiride', 'dl-images');
-    fs.readFile(req.files.image.path, function(err, data) {
-                fs.writeFile(newPath.split(' ').join('-')+"/" + req.files.image.originalFilename, data, function(err) {
-                    if (err) {
-                        res.json({ 'response': "Error" });
-                    } else {
-                       res.json({ 'response': "Saved" });   
-                    }
-                });
-            });
+app.post('/upload', function(req, res) {
+  console.log(req.files.image.originalFilename);
+  console.log(req.files.image.path);
+  fs.readFile(req.files.image.path, function (err, data){
+    var dirname = app.use(express.static(__dirname + '/uploads'));
+    var newPath = dirname +"/" +   req.files.image.originalFilename;
+    fs.writeFile(newPath, data, function (err) {
+      if(err){
+        res.json({'response':"Error"});
+      }else {
+       res.json({'response':"Saved"});     
+      }
+    });
+  });
 });
 
 app.post('/register',function(req,res){
