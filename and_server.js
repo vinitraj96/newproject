@@ -430,6 +430,101 @@ app.post('/FetchAccount',function(req,res){
 
 });
 
+app.post('/UpdateName',function(req,res){
+  var phoneNo=req.body.phoneNo;
+  var username=req.body.username;
+  user.find({ mobileNo: phoneNo },
+  function(err,doc) {
+      if (err) throw err;
+
+      else{
+      if(doc.length===0){
+        console.log('invalid user');
+        res.json({"msg":"not sucess"});
+      }
+      if(doc.length===1){
+        user.update({mobileNo:mobileNo},
+		{
+		  $set: {
+		   username : username
+		  }
+		},function(err,doc){
+		  if(err){
+		    console.log('error');
+		  }else{
+		    res.json({"doc":"sucess"});
+		  }
+	});
+      }
+    }
+        
+  });
+
+});
+
+app.post('/UpdateEmail',function(req,res){
+  var phoneNo=req.body.phoneNo;
+  var email=req.body.email;
+  user.find({ mobileNo: phoneNo },
+  function(err,doc) {
+      if (err) throw err;
+
+      else{
+      if(doc.length===0){
+        console.log('invalid user');
+        res.json({"msg":"not sucess"});
+      }
+      if(doc.length===1){
+        user.update({mobileNo:mobileNo},
+		{
+		  $set: {
+		   email : email
+		  }
+		},function(err,doc){
+		  if(err){
+		    console.log('error');
+		  }else{
+		    res.json({"doc":"sucess"});
+		  }
+	});
+      }
+    }
+        
+  });
+
+});
+
+app.post('/UpdateAddress',function(req,res){
+  var phoneNo=req.body.phoneNo;
+  var address=req.body.address;
+  user.find({ mobileNo: phoneNo },
+  function(err,doc) {
+      if (err) throw err;
+
+      else{
+      if(doc.length===0){
+        console.log('invalid user');
+        res.json({"msg":"not sucess"});
+      }
+      if(doc.length===1){
+        user.update({mobileNo:mobileNo},
+		{
+		  $set: {
+		   address : address
+		  }
+		},function(err,doc){
+		  if(err){
+		    console.log('error');
+		  }else{
+		    res.json({"doc":"sucess"});
+		  }
+	});
+      }
+    }
+        
+  });
+
+});
 
 app.post('/FetchAllAddress',function(req,res){
   console.log("FetchAllAddress");
