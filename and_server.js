@@ -9,23 +9,7 @@ var router = express.Router();
  
 //multer object creation
 var multer  = require('multer')
-var storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/')
-    },
-    filename: function (req, file, cb) {
-        cb(null, file.originalname)
-  }
-})
- 
-var upload = multer({ storage: storage })
- 
- 
-app.post('/upload', upload.single('imageupload'),function(req, res) {
-  res.send("File upload sucessfully.");
-});
- 
-module.exports = router;
+
 
 const Nexmo = require('nexmo');
 const nexmo = new Nexmo({
@@ -120,6 +104,24 @@ pass: "sugun.bintu.123&"
 });
 
 ///////////////////////////////////////////////////// Registration and Login Routes Starts /////////////////////////////////////////////
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/')
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname)
+  }
+})
+ 
+var upload = multer({ storage: storage })
+ 
+ 
+app.post('/upload', upload.single('imageupload'),function(req, res) {
+  res.send("File upload sucessfully.");
+});
+ 
+module.exports = router;
+
 app.post('/register',function(req,res){
   console.log("register");
   var mobileNo=req.body.mobileNo;
