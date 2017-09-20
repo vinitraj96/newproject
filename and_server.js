@@ -443,7 +443,7 @@ app.post('/UpdateName',function(req,res){
         res.json({"msg":"not sucess"});
       }
       if(doc.length===1){
-        user.update({mobileNo:mobileNo},
+        user.update({mobileNo:phoneNo},
 		{
 		  $set: {
 		   username : username
@@ -475,7 +475,7 @@ app.post('/UpdateEmail',function(req,res){
         res.json({"msg":"not sucess"});
       }
       if(doc.length===1){
-        user.update({mobileNo:mobileNo},
+        user.update({mobileNo:phoneNo},
 		{
 		  $set: {
 		   email : email
@@ -507,7 +507,7 @@ app.post('/UpdateAddress',function(req,res){
         res.json({"msg":"not sucess"});
       }
       if(doc.length===1){
-        user.update({mobileNo:mobileNo},
+        user.update({mobileNo:phoneNo},
 		{
 		  $set: {
 		   address : address
