@@ -48,7 +48,8 @@ var User = new mongoose.Schema({
 	vechleStartDate:String,
 	vechileStartTime:String,
 	vechileEndDate:String,
-	vechileEndTime:String
+	vechileEndTime:String,
+	drivingLicence:String
 	
 });
 
@@ -102,6 +103,7 @@ pass: "sugun.bintu.123&"
 ///////////////////////////////////////////////////// Registration and Login Routes Starts /////////////////////////////////////////////
 
 app.post('/upload', function(req, res) {
+  var phoneNo=req.body.phoneNo;
   console.log(req.files.image.originalFilename);
   console.log(req.files.image.path);
     fs.readFile(req.files.image.path, function (err, data){
@@ -111,26 +113,35 @@ app.post('/upload', function(req, res) {
     if(err){
     res.json({'response':"Error"});
     }else {
-    res.json({'response':"Saved"});     
+	  user.find({ mobileNo: phoneNo },
+	  function(err,doc) {
+	      if (err) throw err;
+
+	      else{
+	      if(doc.length===0){
+		console.log('invalid user');
+		res.json({"msg":"not sucess"});
+	      }
+	      if(doc.length===1){
+		user.update({mobileNo:phoneNo},
+			{
+			  $set: {
+			   drivingLicence:"saved"
+			  }
+			},function(err,doc){
+			  if(err){
+			    console.log('error');
+			  }else{
+			      res.json({'response':"Saved"});
+			  }
+		});
+	      }
+	    }
+
+	  });     
 }
 });
 });
-});
-
-app.post('/upload', function(req, res) {
-  console.log(req.files.image.originalFilename);
-  console.log(req.files.image.path);
-  fs.readFile(req.files.image.path, function (err, data){
-    var dirname = app.use(express.static(__dirname + '/uploads'));
-    var newPath = dirname +"/" +   req.files.image.originalFilename;
-    fs.writeFile(newPath, data, function (err) {
-      if(err){
-        res.json({'response':"Error"});
-      }else {
-       res.json({'response':"Saved"});     
-      }
-    });
-  });
 });
 
 app.post('/register',function(req,res){
@@ -167,7 +178,9 @@ app.post('/register',function(req,res){
 		vechleStartDate:'',
 		vechileStartTime:'',
 		vechileEndDate:'',
-		vechileEndTime:''
+		vechileEndTime:'',
+		drivingLicence:''
+
         }).save(function(err, doc){
           if(err) console.log('error');
           else{
