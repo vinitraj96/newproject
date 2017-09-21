@@ -19,7 +19,7 @@ var nodemailer = require("nodemailer");
 mongoose.connect('mongodb://vinitraj:vin@ds127854.mlab.com:27854/pipiride');
 
 // Configuration
-app.use(express.static(__dirname + '/uploads'));
+app.use(express.static(__dirname + '/public'));
 app.use(connect.cookieParser());
 app.use(connect.logger('dev'));
 app.use(connect.bodyParser());
@@ -100,6 +100,23 @@ pass: "sugun.bintu.123&"
 });
 
 ///////////////////////////////////////////////////// Registration and Login Routes Starts /////////////////////////////////////////////
+
+app.post('/upload', function(req, res) {
+  console.log(req.files.image.originalFilename);
+  console.log(req.files.image.path);
+    fs.readFile(req.files.image.path, function (err, data){
+    var dirname = "/home/ubuntu/newproject";
+    var newPath = dirname + "/uploads/" +   req.files.image.originalFilename;
+    fs.writeFile(newPath, data, function (err) {
+    if(err){
+    res.json({'response':"Error"});
+    }else {
+    res.json({'response':"Saved"});     
+}
+});
+});
+});
+
 app.post('/upload', function(req, res) {
   console.log(req.files.image.originalFilename);
   console.log(req.files.image.path);
