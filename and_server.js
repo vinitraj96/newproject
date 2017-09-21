@@ -19,7 +19,7 @@ var nodemailer = require("nodemailer");
 mongoose.connect('mongodb://vinitraj:vin@ds127854.mlab.com:27854/pipiride');
 
 // Configuration
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/uploads'));
 app.use(connect.cookieParser());
 app.use(connect.logger('dev'));
 app.use(connect.bodyParser());
