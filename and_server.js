@@ -623,7 +623,7 @@ app.post('/EndTrip',function(req,res){
       }
       if(doc.length===1){
 	      bikeDoc=doc;
-        AddBike.update( {$and:[{bikeName:bikeName,bikeRegNo:bikeRegNo}]},
+        AddBike.update( { vechileBookedByPhoneNo: phoneNo },
 	{
 	  $set: {
 
