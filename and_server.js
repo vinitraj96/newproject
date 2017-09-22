@@ -610,6 +610,45 @@ app.post('/StartTrip',function(req,res){
 
 });
 
+app.post('/EndTrip',function(req,res){
+  var phoneNo=req.body.phoneNo;
+   AddBike.find({ vechileBookedByPhoneNo: phoneNo },
+  function(err,doc) {
+      if (err) throw err;
+
+      else{
+      if(doc.length===0){
+	console.log('invalid user');
+	res.json({"msg":"invalid"});
+      }
+      if(doc.length===1){
+	      bikeDoc=doc;
+        AddBike.update( {$and:[{bikeName:bikeName,bikeRegNo:bikeRegNo}]},
+	{
+	  $set: {
+
+		  vechilePriceBooked : '',
+		  vechleStartDate :  '',
+		  vechileStartTime : '',
+		  vechileEndDate : '',
+		  vechileEndTime : '',
+		  vechileBookedByPhoneNo:''
+	  }
+	},function(err,doc){
+	  if(err){
+	    console.log('error');
+	  }else{
+		   res.json({"doc":"sucess"});
+		  //setTimeout(myFunc, 5 * 60 * 1000,mobileNo,otp,res);
+	  }
+	});
+      }
+    }
+        
+  });
+
+});
+
 app.post('/UpdateEmail',function(req,res){
   var phoneNo=req.body.phoneNo;
   var email=req.body.email;
