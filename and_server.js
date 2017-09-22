@@ -590,6 +590,8 @@ app.post('/FetchAllAddress',function(req,res){
 	    user.find({mobileNo:phoneNo},function(err,doc){
 	    	if(err){
 		}else{
+			console.log("doc >>>>>>>>>>>>>>>>>>>>>>>>> ");
+			console.log(doc);
 			if(doc[0].vechileNameBooked==''){
 				 console.log(data);
         			res.json({"doc":data,"bookedStatus":"not booked"});	
