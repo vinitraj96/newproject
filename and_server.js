@@ -638,7 +638,27 @@ app.post('/EndTrip',function(req,res){
 	  if(err){
 	    console.log('error');
 	  }else{
-		   res.json({"doc":"sucess"});
+		user.update({mobileNo:phoneNo},
+		{
+		  $set: {
+		     	vechileNameBooked:'',
+			vechileAreaBooked:'',
+			vechileLocationBooked:'',
+			vechilePriceBooked:'',
+			vechleStartDate:'',
+			vechileStartTime:'',
+			vechileEndDate:'',
+			vechileEndTime:'',
+			vechileRegNo:''
+		  }
+		},function(err,doc){
+		  if(err){
+		    console.log('error');
+		  }else{
+			res.json({"doc":"sucess"});
+		  }
+		 });
+		  
 		  //setTimeout(myFunc, 5 * 60 * 1000,mobileNo,otp,res);
 	  }
 	});
