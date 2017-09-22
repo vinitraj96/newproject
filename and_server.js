@@ -525,6 +525,7 @@ app.post('/StartTrip',function(req,res){
   var phoneNo=req.body.phoneNo;
   var bikeName=req.body.bikeName;
   var bikeRegNo=req.body.bikeRegNo;
+  var bikeDoc;
   user.find({ mobileNo: phoneNo },
   function(err,doc) {
       if (err) throw err;
@@ -544,7 +545,62 @@ app.post('/StartTrip',function(req,res){
 		  if(err){
 		    console.log('error');
 		  }else{
-		    res.json({"doc":"sucess"});
+		    
+			   AddBike.find({ vechileBookedByPhoneNo: phoneNo },
+				  function(err,doc) {
+				      if (err) throw err;
+
+				      else{
+				      if(doc.length===0){
+					console.log('invalid user');
+					res.json({"msg":"invalid"});
+				      }
+				      if(doc.length===1){
+					      bikeDoc=doc;
+					AddBike.update( { vechileBookedByPhoneNo: phoneNo },
+						{
+						  $set: {
+
+							  vechilePriceBooked : '',
+							  vechleStartDate : '',
+							  vechileStartTime : '',
+							  vechileEndDate : '',
+							  vechileEndTime : '',
+							  vechileBookedByPhoneNo:''
+						  }
+						},function(err,doc){
+						  if(err){
+						    console.log('error');
+						  }else{
+						    //setTimeout(myFunc, 5 * 60 * 1000,mobileNo,otp,res);
+							AddBike.update( {$and:[{bikeName:bikeName,bikeRegNo:bikeRegNo}]},
+							{
+							  $set: {
+
+								  vechilePriceBooked : bikeDoc[0].vechilePriceBooked,
+								  vechleStartDate :  bikeDoc[0].vechleStartDate,
+								  vechileStartTime : bikeDoc[0].vechleStartDate,
+								  vechileEndDate : bikeDoc[0].vechileEndDate,
+								  vechileEndTime : bikeDoc[0].vechileEndTime,
+								  vechileBookedByPhoneNo:phoneNo
+							  }
+							},function(err,doc){
+							  if(err){
+							    console.log('error');
+							  }else{
+								   res.json({"doc":"sucess"});
+								  //setTimeout(myFunc, 5 * 60 * 1000,mobileNo,otp,res);
+							  }
+							});
+
+						   
+						  }
+					});					
+					//res.json({"doc":doc})
+				      }
+				    }
+
+				  });
 		  }
 	});
       }
