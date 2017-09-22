@@ -49,6 +49,7 @@ var User = new mongoose.Schema({
 	vechileStartTime:String,
 	vechileEndDate:String,
 	vechileEndTime:String,
+	vechileRegNo:String,
 	drivingLicence:String
 	
 });
@@ -62,11 +63,15 @@ var AddBike = new mongoose.Schema({
   kmLimitSixHour: String,
   areaName      : String,
   location      : String,
+  bikeRegNo: String,
+  bikeRegYear: String,
+  bikeColor: String,
   vechilePriceBooked:String,
   vechleStartDate:String,
   vechileStartTime:String,
   vechileEndDate:String,
   vechileEndTime:String,
+  vechileRegNo:String,
   vechileBookedByPhoneNo:String
 });
 
@@ -179,6 +184,7 @@ app.post('/register',function(req,res){
 		vechileStartTime:'',
 		vechileEndDate:'',
 		vechileEndTime:'',
+		vechileRegNo:'',
 		drivingLicence:''
 
         }).save(function(err, doc){
