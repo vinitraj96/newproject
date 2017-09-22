@@ -44,6 +44,7 @@ var User = new mongoose.Schema({
   	verificationCode :String,
 	vechileNameBooked:String,
 	vechileAreaBooked:String,
+	vechileLocationBooked:String,
 	vechilePriceBooked:String,
 	vechleStartDate:String,
 	vechileStartTime:String,
@@ -179,6 +180,7 @@ app.post('/register',function(req,res){
 		verificationCode :'',
 		vechileNameBooked:'',
 		vechileAreaBooked:'',
+		vechileLocationBooked:'',
 		vechilePriceBooked:'',
 		vechleStartDate:'',
 		vechileStartTime:'',
@@ -276,6 +278,7 @@ app.post('/CompletePayment',function(req,res){
 	var vechileStartTime=req.body.starttime;
 	var vechileEndDate=req.body.enddate;
 	var vechileEndTime=req.body.endtime;
+	var vechileLocationBooked=req.body.location;
 	  user.find({'mobileNo': mobileNo } ,function(err,data){
 	    if(err){
 
@@ -287,6 +290,7 @@ app.post('/CompletePayment',function(req,res){
 		  $set: {
 		   vechileNameBooked : vechileNameBooked,
 			  vechileAreaBooked : vechileAreaBooked,
+			  vechileLocationBooked : vechileLocationBooked,
 			  vechilePriceBooked : vechilePriceBooked,
 			  vechleStartDate : vechleStartDate,
 			  vechileStartTime : vechileStartTime,
@@ -300,7 +304,7 @@ app.post('/CompletePayment',function(req,res){
 		    //setTimeout(myFunc, 5 * 60 * 1000,mobileNo,otp,res);
 
 		    //res.json({"doc":"valid","otp":"otp: "+otp.toString()});
-		  	AddBike.update({ $and: [ {'areaName': vechileAreaBooked }, { 'bikeName': vechileNameBooked } ] },
+		  	AddBike.update( { 'bikeName': vechileNameBooked },
 			{
 			  $set: {
 				  
