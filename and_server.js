@@ -408,7 +408,7 @@ app.post('/AddBike',function(req,res){
   var priceSixHour= req.body.priceSixHour;
   var kmLimitSixHour= req.body.kmLimitSixHour;
   var areaName= req.body.areaName;
-  var location= req.body.location;
+  var location= req.body.locationName;
   AddBike.find({ $and: [ {'bikeName': bikeName }, { 'bikeRegNo': bikeRegNo } ] },function(err,data){
     if(err){
 
