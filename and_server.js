@@ -185,7 +185,8 @@ app.post('/register',function(req,res){
 		vechileEndDate:'',
 		vechileEndTime:'',
 		vechileRegNo:'',
-		drivingLicence:''
+		drivingLicence:'',
+		vechileRegNo:''
 
         }).save(function(err, doc){
           if(err) console.log('error');
@@ -501,6 +502,39 @@ app.post('/UpdateName',function(req,res){
 		{
 		  $set: {
 		   username : username
+		  }
+		},function(err,doc){
+		  if(err){
+		    console.log('error');
+		  }else{
+		    res.json({"doc":"sucess"});
+		  }
+	});
+      }
+    }
+        
+  });
+
+});
+
+app.post('/StartTrip',function(req,res){
+  var phoneNo=req.body.phoneNo;
+  var bikeName=req.body.bikeName;
+  var bikeRegNo=req.body.bikeRegNo;
+  user.find({ mobileNo: phoneNo },
+  function(err,doc) {
+      if (err) throw err;
+
+      else{
+      if(doc.length===0){
+        console.log('invalid user');
+        res.json({"msg":"not sucess"});
+      }
+      if(doc.length===1){
+        user.update({mobileNo:phoneNo},
+		{
+		  $set: {
+		   vechileRegNo:bikeRegNo
 		  }
 		},function(err,doc){
 		  if(err){
